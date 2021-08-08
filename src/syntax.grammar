@@ -7,9 +7,9 @@ statement {
   IdentifierWithParam { Identifier "(" (Colour | Number) ")" } |
   Subroutine { "Anweisung" Identifier statement* ("endeAnweisung" | "*Anweisung") } |
   Condition { "Bedingung" Identifier statement* ("endeBedingung" | "*Bedingung") } |
-  If { "wenn" ?"nicht" Identifier "dann" statement* ?("sonst" statement*) ("endewenn" | "*wenn") } |
-  While { "wiederhole" ("immer" | Number "mal" | "solange" ?"nicht" Identifier) statement* ("endewiederhole" | "*wiederhole") } |
-  WhileEnd {"wiederhole" statement* ("endewiederhole" | "*wiederhole") (("solange" | "bis") ?"nicht" Identifier) }
+  If { "wenn" "nicht"? Identifier "dann" statement* ("sonst" statement*)? ("endewenn" | "*wenn") } |
+  While { "wiederhole" ("immer" | Number "mal" | "solange" "nicht"? Identifier) statement* ("endewiederhole" | "*wiederhole") } |
+  WhileEnd {"wiederhole" statement* ("endewiederhole" | "*wiederhole") (("solange" | "bis") "nicht"? Identifier) }
 }
 
 @tokens {
@@ -17,12 +17,12 @@ statement {
   "Bedingung" "endeBedingung" "*Bedingung"
   "wiederhole" "endewiederhole" "*wiederhole" "mal" "solange" "bis" "immer"
   "wenn" "endewenn" "*wenn" "nicht" "dann" "sonst"
-  Identifier { $[a-zA-Z_\-0-9]+ }
+  "(" ")"
+  
+  Identifier { $[a-zA-Z_\-0-9]* $[a-zA-Z_] $[a-zA-Z_\-0-9]* }
   Number { $[0-9]+ }
-  Colour { "rot" "gelb" "blau" "grün" "schwarz" }
+  Colour { "rot" | "gelb" | "blau" | "grün" | "schwarz" }
   space { $[ \t\n\r;]+ }
-  "("
-  ")"
   
   @precedence {"Anweisung", "endeAnweisung", "*Anweisung", 
             "Bedingung", "endeBedingung", "*Bedingung",
