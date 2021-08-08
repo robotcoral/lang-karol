@@ -1,11 +1,69 @@
 # Identifiers
 
-one
-Two_Three
+123234892_2342341
+Two_Three2342
 
 ==>
 
 Program(Identifier, Identifier)
+
+# IdentifierWithParam
+
+abc(123)
+123234892_2342341(gelb)
+
+==>
+
+Program(IdentifierWithParam(Identifier, Number), IdentifierWithParam(Identifier, Colour))
+
+
+# Subroutine
+
+Anweisung abc
+  Schritt
+endeAnweisung
+
+Anweisung abc
+  Schritt
+*Anweisung
+
+==>
+
+Program(Subroutine(Anweisung, Identifier, Identifier), Subroutine(Anweisung, Identifier, Identifier))
+
+# Condition
+
+Bedingung abc
+  Schritt
+endeBedingung
+
+Bedingung abc
+  Schritt
+*Bedingung
+
+==>
+
+Program(Condition(Bedingung, Identifier, Identifier), Condition(Bedingung, Identifier, Identifier))
+
+# If-Statement
+
+wenn abc dann
+  Schritt
+endewenn
+
+wenn nicht abc dann
+  Schritt
+*wenn
+
+wenn nicht abc dann
+  Schritt
+sonst
+  Schritt
+endewenn
+
+==>
+
+Program(If(Identifier, Identifier), If(Identifier, Identifier), If(Identifier, Identifier, Identifier))
 
 # While Forever
 
@@ -16,3 +74,49 @@ endewiederhole
 ==>
 
 Program(While(Identifier))
+
+# While N Times
+
+wiederhole 10 mal
+  Schritt
+endewiederhole
+
+==>
+
+Program(While(Number, Identifier))
+
+# While Condition
+
+wiederhole solange abc
+  Schritt
+endewiederhole
+
+wiederhole solange nicht abc
+  Schritt
+endewiederhole
+
+==>
+
+Program(While(Identifier, Identifier), While(Identifier, Identifier))
+
+# While Endcondition
+
+wiederhole
+  Schritt
+endewiederhole solange abc
+
+wiederhole
+  Schritt
+endewiederhole solange nicht abc
+
+wiederhole
+  Schritt
+endewiederhole bis abc
+
+wiederhole
+  Schritt
+endewiederhole bis nicht abc
+
+==>
+
+Program(WhileEnd(Identifier, Identifier), WhileEnd(Identifier, Identifier), WhileEnd(Identifier, Identifier), WhileEnd(Identifier, Identifier))
