@@ -5,23 +5,18 @@ import {styleTags, tags as t} from "@codemirror/highlight"
 export const EXAMPLELanguage = LezerLanguage.define({
   parser: parser.configure({
     props: [
-      indentNodeProp.add({
-        Application: delimitedIndent({closing: ")", align: false})
-      }),
-      foldNodeProp.add({
-        Application: foldInside
-      }),
       styleTags({
         Identifier: t.variableName,
-        Boolean: t.bool,
-        String: t.string,
-        LineComment: t.lineComment,
+        Colour: t.literal,
+        Number: t.number,
+        comment: t.blockComment,
+        Keyword: t.keyword,
         "( )": t.paren
       })
     ]
   }),
   languageData: {
-    commentTokens: {line: ";"}
+    commentTokens: {block: {open: "{", close: "}"}}
   }
 })
 

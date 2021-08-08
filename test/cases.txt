@@ -16,6 +16,19 @@ abc(123)
 
 Program(IdentifierWithParam(Identifier, Number), IdentifierWithParam(Identifier, Colour))
 
+# Comments
+
+{   sf  sdf  234
+sf 12123
+3452345dgdsfgsere_
+dfgsdfhhs sdg 
+}
+abc(123) {}
+
+
+==>
+
+Program(IdentifierWithParam(Identifier, Number))
 
 # Subroutine
 
@@ -29,7 +42,7 @@ Anweisung abc
 
 ==>
 
-Program(Subroutine(Anweisung, Identifier, Identifier), Subroutine(Anweisung, Identifier, Identifier))
+Program(Subroutine(Identifier, Identifier), Subroutine(Identifier, Identifier))
 
 # Condition
 
@@ -43,7 +56,7 @@ Bedingung abc
 
 ==>
 
-Program(Condition(Bedingung, Identifier, Identifier), Condition(Bedingung, Identifier, Identifier))
+Program(Condition(Identifier, Identifier), Condition(Identifier, Identifier))
 
 # If-Statement
 
