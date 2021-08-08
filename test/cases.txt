@@ -1,0 +1,18 @@
+# Identifiers
+
+one
+Two_Three
+
+==>
+
+Program(Identifier, Identifier)
+
+# While Forever
+
+wiederhole immer
+  Schritt
+endewiederhole
+
+==>
+
+Program(While(Identifier))
