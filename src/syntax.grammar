@@ -17,7 +17,6 @@ statement {
   "Bedingung" "endeBedingung" "*Bedingung"
   "wiederhole" "endewiederhole" "*wiederhole" "mal" "solange" "bis" "immer"
   "wenn" "endewenn" "*wenn" "nicht" "dann" "sonst"
-  
   Identifier { $[a-zA-Z_\-0-9]+ }
   Number { $[0-9]+ }
   Colour { "rot" "gelb" "blau" "grün" "schwarz" }
