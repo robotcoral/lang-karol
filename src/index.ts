@@ -2,7 +2,7 @@ import {parser} from "./syntax.grammar"
 import {LezerLanguage, LanguageSupport, indentNodeProp, foldNodeProp, foldInside, delimitedIndent} from "@codemirror/language"
 import {styleTags, tags as t} from "@codemirror/highlight"
 
-export const EXAMPLELanguage = LezerLanguage.define({
+export const karolLanguage = LezerLanguage.define({
   parser: parser.configure({
     props: [
       styleTags({
@@ -20,6 +20,6 @@ export const EXAMPLELanguage = LezerLanguage.define({
   }
 })
 
-export function EXAMPLE() {
-  return new LanguageSupport(EXAMPLELanguage)
+export function karol() {
+  return new LanguageSupport(karolLanguage)
 }
