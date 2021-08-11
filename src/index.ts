@@ -25,6 +25,18 @@ export function karol() {
 	return new LanguageSupport(karolLanguage);
 }
 
-export function compile(): CompilerResult {
+export function compile(str: string): CompilerResult {
+	let cursor = parser.parse(str).cursor();
+	do {
+		console.log(
+			`Node ${cursor.name} from ${cursor.from} to ${
+				cursor.to
+			} => ${str.substring(cursor.from, cursor.to)}`
+		);
+	} while (cursor.next());
 	return { kind: "error", msg: "not implemented yet", line: 0 };
+}
+
+export function parse(str: string) {
+	return parser.parse(str);
 }
