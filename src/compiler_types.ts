@@ -75,9 +75,9 @@ export type TreeNode =
 	  };
 
 export type KarolProgram = {
-	start: Node;
-	subroutines: [Node];
-	conditions: [Node];
+	start: TreeNode;
+	subroutines: [TreeNode];
+	conditions: [TreeNode];
 };
 
 export type CompilerResult =
