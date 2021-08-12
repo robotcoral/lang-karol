@@ -6,7 +6,7 @@ export const karolLanguage = LezerLanguage.define({
   parser: parser.configure({
     props: [
       styleTags({
-        Identifier: t.variableName,
+        Identifier: t.name,
         Colour: t.literal,
         Number: t.number,
         comment: t.blockComment,

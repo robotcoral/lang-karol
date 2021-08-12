@@ -14,7 +14,9 @@ abc(123)
 
 ==>
 
-Program(IdentifierWithParam(Identifier, Number), IdentifierWithParam(Identifier, Colour))
+Program(
+  IdentifierWithParam(Identifier, Number), 
+  IdentifierWithParam(Identifier, Colour))
 
 # Comments
 
@@ -42,7 +44,9 @@ Anweisung abc
 
 ==>
 
-Program(Subroutine(Identifier, Identifier), Subroutine(Identifier, Identifier))
+Program(
+  Subroutine(Keyword, Identifier, Identifier, Keyword), 
+  Subroutine(Keyword, Identifier, Identifier, Keyword))
 
 # Condition
 
@@ -56,7 +60,9 @@ Bedingung abc
 
 ==>
 
-Program(Condition(Identifier, Identifier), Condition(Identifier, Identifier))
+Program(
+  Condition(Keyword, Identifier, Identifier, Keyword), 
+  Condition(Keyword, Identifier, Identifier, Keyword))
 
 # If-Statement
 
@@ -76,7 +82,10 @@ endewenn
 
 ==>
 
-Program(If(Identifier, Identifier), If(Identifier, Identifier), If(Identifier, Identifier, Identifier))
+Program(
+  If(Keyword, Identifier, Keyword, Identifier, Keyword), 
+  If(Keyword, Keyword, Identifier, Keyword, Identifier, Keyword), 
+  If(Keyword, Keyword, Identifier, Keyword, Identifier, Keyword, Identifier, Keyword))
 
 # While Forever
 
@@ -86,7 +95,7 @@ endewiederhole
 
 ==>
 
-Program(While(Identifier))
+Program(While(Keyword, Keyword, Identifier, Keyword))
 
 # While N Times
 
@@ -96,7 +105,7 @@ endewiederhole
 
 ==>
 
-Program(While(Number, Identifier))
+Program(While(Keyword, Number, Keyword, Identifier, Keyword))
 
 # While Condition
 
@@ -110,7 +119,9 @@ endewiederhole
 
 ==>
 
-Program(While(Identifier, Identifier), While(Identifier, Identifier))
+Program(
+  While(Keyword, Keyword, Identifier, Identifier, Keyword), 
+  While(Keyword, Keyword, Keyword, Identifier, Identifier, Keyword))
 
 # While Endcondition
 
@@ -132,4 +143,8 @@ endewiederhole bis nicht abc
 
 ==>
 
-Program(WhileEnd(Identifier, Identifier), WhileEnd(Identifier, Identifier), WhileEnd(Identifier, Identifier), WhileEnd(Identifier, Identifier))
+Program(
+  WhileEnd(Keyword, Identifier, Keyword, Keyword, Identifier), 
+  WhileEnd(Keyword, Identifier, Keyword, Keyword, Keyword, Identifier), 
+  WhileEnd(Keyword, Identifier, Keyword, Keyword, Identifier), 
+  WhileEnd(Keyword, Identifier, Keyword, Keyword, Keyword, Identifier))
