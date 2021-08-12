@@ -1,5 +1,5 @@
 {
-  "name": "lang-karol",
+  "name": "@robotcoral/lang-karol",
   "version": "0.1.1",
   "description": "karol language support for CodeMirror",
   "scripts": {
