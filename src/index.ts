@@ -60,7 +60,7 @@ function compileIdentifier(str: string, cursor: TreeCursor): InnerCompilationRes
 		if(val === "wahr" || val === "falsch") {
 			return { kind: "success", result: `yield ${val === "wahr"};`}; 
 		}
-		return { kind: "success", result: `for(let n of subroutines.${val}()) {\n\tyield n;\n};`};
+		return { kind: "success", result: `for(let n of ${val}()) {\n\tyield n;\n};` };
 	}
 }
 
@@ -84,7 +84,7 @@ function compileConditionIdentifier(str: string, cursor: TreeCursor): InnerCompi
 		if(callIdentifiers.has(val) || conditionIdentifiers.has(val)) {
 			return { kind: "success", result: `(function*(){yield karol.${val}()})()`}; 
 		}
-		return { kind: "success", result: `conditions.${val}()`};
+		return { kind: "success", result: `${val}()` };
 	}
 }
 
@@ -419,4 +419,3 @@ export function compile(str: string): CompilationResult {
 	let GeneratorFunction = Object.getPrototypeOf(function*(){}).constructor;
 	return { kind: "success", result: new GeneratorFunction("karol", `${program.join("\n")}`) };
 }
-
