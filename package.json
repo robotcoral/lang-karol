@@ -28,5 +28,5 @@
     "rollup-plugin-ts": "^1.4.1",
     "typescript": "^4.4.2"
   },
-  "license": "MIT"
+  "license": "GPL-3.0-or-later"
 }
