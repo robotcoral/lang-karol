@@ -1,6 +1,6 @@
 # Identifiers
 
-123234892_2342341
+_1232348922342341
 Two_Three2342
 
 ==>
@@ -10,7 +10,7 @@ Program(Identifier, Identifier)
 # IdentifierWithParam
 
 abc(123)
-123234892_2342341(gelb)
+_1232348922342341(gelb)
 
 ==>
 
