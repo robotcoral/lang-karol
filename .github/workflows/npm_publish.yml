@@ -4,9 +4,11 @@
 name: Publish to npm
 
 on:
-  push:
-    branches:
-      - main
+  #push:
+  #  branches:
+  #    - main
+
+  workflow_dispatch:
 
 jobs:
   build:

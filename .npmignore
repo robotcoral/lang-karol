@@ -1,5 +1,6 @@
 /src
 /test
 /node_modules
+/.github
 rollup.config.js
 tsconfig.json
