@@ -54,6 +54,11 @@ jobs:
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Delete old package version
+        uses: actions/delete-package-versions@v1
+        with:
+          package-name: 'lang-karol'
+
           
   create-release:
     needs: build
