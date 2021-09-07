@@ -351,8 +351,8 @@ export function compile(str: string): CompilationResult {
 		let lit = cursor.name;
 		switch(lit) {
 			case "Identifier":
-				if(!conditions.has(val) && !subroutines.has(val) && !conditionIdentifiers.has(val) && !callIdentifiers.has(val)) {
-					return { kind: "error", msg: "unknown subroutine/condition", pos: pos };
+				if(!conditions.has(val) && !subroutines.has(val) && !conditionIdentifiers.has(val) && !callIdentifiers.has(val) && val !== "wahr" && val !== "falsch") {
+					return { kind: "error", msg: "unknown subroutine/condition", pos: {from: cursor.from, to: cursor.to} };
 				}
 				break;
 			case "IdentifierWithParam":
@@ -361,8 +361,17 @@ export function compile(str: string): CompilationResult {
 				cursor.firstChild();
 				cursor.nextSibling();
 				val = getVal(str, cursor);
+				if(val === "nicht")
+					cursor.nextSibling();
+				if(cursor.name === "IdentifierWithParam") {
+					cursor.firstChild();
+					val = getVal(str, cursor);	
+					cursor.parent();
+				} else {
+					val = getVal(str, cursor);	
+				}
 				if(!conditions.has(val) && !conditionIdentifiers.has(val)) {
-					return { kind: "error", msg: "identifier must be a condition", pos: pos };
+					return { kind: "error", msg: "identifier must be a condition", pos: {from: cursor.from, to: cursor.to} };
 				}
 				cursor.parent();
 				break;
@@ -370,37 +379,47 @@ export function compile(str: string): CompilationResult {
 				cursor.firstChild(); // wiederhole
 				cursor.nextSibling(); // "immer" | "solange" | Number
 				val = getVal(str, cursor);
-				if(val === "immer" || cursor.name === "Number") // skip times and forever loops
+				if(val === "immer" || cursor.name === "Number") { // skip times and forever loops
+					cursor.parent();
 					break;
+				}
 				cursor.nextSibling();
 				if(getVal(str, cursor) === "nicht")
 					cursor.nextSibling();
+				if(cursor.name === "IdentifierWithParam") {
+					cursor.firstChild();
+					val = getVal(str, cursor);	
+					cursor.parent();
+				} else {
+					val = getVal(str, cursor);	
+				}
 				if(!conditions.has(val) && !conditionIdentifiers.has(val)) {
-					return { kind: "error", msg: "identifier must be a condition", pos: pos };
+					return { kind: "error", msg: "identifier must be a condition", pos: {from: cursor.from, to: cursor.to} };
 				}
 				cursor.parent();
 				break;
 			case "WhileEnd":
 				cursor.firstChild(); // "wiederhole"
-		
 				while(cursor.nextSibling()) {
 					let val = getVal(str, cursor);
 					if(val === "endewiederhole" || val === "*wiederhole")
 						break;
 				}
-		
 				cursor.nextSibling(); // "solange" | "bis"
 				cursor.nextSibling();
-
 				if(getVal(str, cursor) === "nicht") {
 					cursor.nextSibling();
 				}
-
-				val = getVal(str, cursor);
-				if(!conditions.has(val) && !conditionIdentifiers.has(val)) {
-					return { kind: "error", msg: "identifier must be a condition", pos: pos };
+				if(cursor.name === "IdentifierWithParam") {
+					cursor.firstChild();
+					val = getVal(str, cursor);	
+					cursor.parent();
+				} else {
+					val = getVal(str, cursor);	
 				}
-
+				if(!conditions.has(val) && !conditionIdentifiers.has(val)) {
+					return { kind: "error", msg: "identifier must be a condition", pos: {from: cursor.from, to: cursor.to} };
+				}
 				cursor.parent();
 				break;
 			case "Subroutine":
@@ -411,7 +430,14 @@ export function compile(str: string): CompilationResult {
 				break;
 			case "Number":
 				break;
+			case "Colour":
+				break;
+			case "(":
+				break;
+			case ")":
+				break;
 			default: // faulty node detected -> parser error
+				console.log(cursor.name);
 				return { kind: "error", msg: "parse error", pos: pos };
 		}
 	} while(cursor.next());
