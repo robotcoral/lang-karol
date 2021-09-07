@@ -1,13 +1,13 @@
 import { styleTags, tags as t } from "@codemirror/highlight";
-import { LanguageSupport, LezerLanguage } from "@codemirror/language";
+import { LanguageSupport, LRLanguage } from "@codemirror/language";
 import { DefinitionCompilationResult, CompilationResult, conditionIdentifiers, callIdentifiers, Position, InnerCompilationResult, ExecutionResult } from "./compiler_types";
 import { parser } from "./syntax.grammar";
-import { NodeType, TreeCursor } from "lezer";
+import { NodeType, TreeCursor } from "@lezer/common";
 
 // TODO: check if condition will always return true or false
 // FIXME: remove * as its own token and add it to the keyword => needs to be fixed inside the grammar
 
-export const karolLanguage = LezerLanguage.define({
+export const karolLanguage = LRLanguage.define({
 	parser: parser.configure({
 		props: [
 			styleTags({
