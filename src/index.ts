@@ -14,8 +14,8 @@ import { parser } from "./syntax.grammar";
 // TODO: check if condition will always return true or false
 // FIXME: remove * as its own token and add it to the keyword => needs to be fixed inside the grammar
 
-const callIdentifiersSet = new Set(...callIdentifiers);
-const conditionIdentifiersSet = new Set(...conditionIdentifiers);
+const callIdentifiersSet = new Set(callIdentifiers);
+const conditionIdentifiersSet = new Set(conditionIdentifiers);
 
 export const karolLanguage = LRLanguage.define({
   parser: parser.configure({
