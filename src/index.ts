@@ -1,40 +1,47 @@
 import { styleTags, tags as t } from "@codemirror/highlight";
 import { LanguageSupport, LRLanguage } from "@codemirror/language";
-import { DefinitionCompilationResult, CompilationResult, conditionIdentifiers, callIdentifiers, Position, InnerCompilationResult, ExecutionResult } from "./compiler_types";
+import { TreeCursor } from "@lezer/common";
+import {
+  callIdentifiers,
+  CompilationResult,
+  conditionIdentifiers,
+  DefinitionCompilationResult,
+  InnerCompilationResult,
+  Position,
+} from "./compiler_types";
 import { parser } from "./syntax.grammar";
-import { NodeType, TreeCursor } from "@lezer/common";
 
 // TODO: check if condition will always return true or false
 // FIXME: remove * as its own token and add it to the keyword => needs to be fixed inside the grammar
 
 export const karolLanguage = LRLanguage.define({
-	parser: parser.configure({
-		props: [
-			styleTags({
-				Identifier: t.variableName,
-				Colour: t.literal,
-				Number: t.number,
-				comment: t.blockComment,
-				Keyword: t.keyword,
-				"( )": t.paren,
-			}),
-		],
-	}),
-	languageData: {
-		commentTokens: { block: { open: "{", close: "}" } },
-	},
+  parser: parser.configure({
+    props: [
+      styleTags({
+        Identifier: t.variableName,
+        Colour: t.literal,
+        Number: t.number,
+        comment: t.blockComment,
+        Keyword: t.keyword,
+        "( )": t.paren,
+      }),
+    ],
+  }),
+  languageData: {
+    commentTokens: { block: { open: "{", close: "}" } },
+  },
 });
 
 export function karol() {
-	return new LanguageSupport(karolLanguage);
+  return new LanguageSupport(karolLanguage);
 }
 
 export function parse(str: string) {
-	return parser.parse(str);
+  return parser.parse(str);
 }
 
 function getVal(str: string, cursor: TreeCursor): string {
-	return str.substring(cursor.from, cursor.to);
+  return str.substring(cursor.from, cursor.to);
 }
 
 function compileIdentifier(str: string, cursor: TreeCursor): InnerCompilationResult {
@@ -64,28 +71,41 @@ function compileIdentifier(str: string, cursor: TreeCursor): InnerCompilationRes
 	}
 }
 
-function compileConditionIdentifier(str: string, cursor: TreeCursor): InnerCompilationResult {
-	let val: string = getVal(str, cursor);
-	let pos: Position = {from: cursor.from, to: cursor.to};
-	if(cursor.name === "IdentifierWithParam") {
-		cursor.firstChild();
-		val = getVal(str, cursor);
-		cursor.nextSibling();
-		cursor.nextSibling();
-		let param: string = getVal(str, cursor);
-		if(callIdentifiers.has(val) || conditionIdentifiers.has(val)) {
-			cursor.parent();
-			return { kind: "success", result: `(function*(){yield karol.${val}("${param}")})()`};
-		} else {
-			cursor.parent();
-			return { kind: "error", msg: "subroutine/condition calls must not contain parameters", pos: pos };
-		}
-	} else {
-		if(callIdentifiers.has(val) || conditionIdentifiers.has(val)) {
-			return { kind: "success", result: `(function*(){yield karol.${val}()})()`}; 
-		}
-		return { kind: "success", result: `${val}()` };
-	}
+function compileConditionIdentifier(
+  str: string,
+  cursor: TreeCursor
+): InnerCompilationResult {
+  let val: string = getVal(str, cursor);
+  let pos: Position = { from: cursor.from, to: cursor.to };
+  if (cursor.name === "IdentifierWithParam") {
+    cursor.firstChild();
+    val = getVal(str, cursor);
+    cursor.nextSibling();
+    cursor.nextSibling();
+    let param: string = getVal(str, cursor);
+    if (callIdentifiers.has(val) || conditionIdentifiers.has(val)) {
+      cursor.parent();
+      return {
+        kind: "success",
+        result: `(function*(){yield karol.${val}("${param}")})()`,
+      };
+    } else {
+      cursor.parent();
+      return {
+        kind: "error",
+        msg: "subroutine/condition calls must not contain parameters",
+        pos: pos,
+      };
+    }
+  } else {
+    if (callIdentifiers.has(val) || conditionIdentifiers.has(val)) {
+      return {
+        kind: "success",
+        result: `(function*(){yield karol.${val}()})()`,
+      };
+    }
+    return { kind: "success", result: `${val}()` };
+  }
 }
 
 function compileWhile(str: string, cursor: TreeCursor): InnerCompilationResult {
@@ -276,26 +296,35 @@ function compileCondition(str: string, cursor: TreeCursor): DefinitionCompilatio
 }
 
 function compileInner(str: string, cursor: TreeCursor): InnerCompilationResult {
-	let val: string = getVal(str, cursor);
-	let pos: Position = {from: cursor.from, to: cursor.to};
-	switch(cursor.name) {
-		case "Identifier":
-			return compileIdentifier(str, cursor);
-		case "IdentifierWithParam":
-			return compileIdentifier(str, cursor);
-		case "If":
-			return compileIf(str, cursor);
-		case "While":
-			return compileWhile(str, cursor);
-		case "WhileEnd":
-			return compileWhileEnd(str, cursor);
-		case "Subroutine":
-			return { kind: "error", msg: "subroutine must not be declared inside another subroutine/condition declaration", pos: pos };
-		case "Condition":
-			return { kind: "error", msg: "condition must not be declared inside another subroutine/condition declaration", pos: pos };
-		default: // faulty node detected -> parser error
-			return { kind: "error", msg: "parse error", pos: pos };
-	}
+  let val: string = getVal(str, cursor);
+  let pos: Position = { from: cursor.from, to: cursor.to };
+  switch (cursor.name) {
+    case "Identifier":
+      return compileIdentifier(str, cursor);
+    case "IdentifierWithParam":
+      return compileIdentifier(str, cursor);
+    case "If":
+      return compileIf(str, cursor);
+    case "While":
+      return compileWhile(str, cursor);
+    case "WhileEnd":
+      return compileWhileEnd(str, cursor);
+    case "Subroutine":
+      return {
+        kind: "error",
+        msg: "subroutine must not be declared inside another subroutine/condition declaration",
+        pos: pos,
+      };
+    case "Condition":
+      return {
+        kind: "error",
+        msg: "condition must not be declared inside another subroutine/condition declaration",
+        pos: pos,
+      };
+    default:
+      // faulty node detected -> parser error
+      return { kind: "error", msg: "parse error", pos: pos };
+  }
 }
 
 export function compile(str: string): CompilationResult {
@@ -443,3 +472,5 @@ export function compile(str: string): CompilationResult {
 	let GeneratorFunction = Object.getPrototypeOf(function*(){}).constructor;
 	return { kind: "success", result: new GeneratorFunction("karol", `${program.join("")}`) };
 }
+
+export * from "./compiler_types";
