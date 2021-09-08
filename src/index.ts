@@ -60,7 +60,7 @@ function compileIdentifier(str: string, cursor: TreeCursor): InnerCompilationRes
 		if(val === "wahr" || val === "falsch") {
 			return { kind: "success", result: `yield ${val === "wahr"};`}; 
 		}
-		return { kind: "success", result: `for(let n of ${val}()) {\n\tyield n;\n};` };
+		return { kind: "success", result: `for(let n of ${val}()){yield n;};` };
 	}
 }
 
@@ -126,18 +126,17 @@ function compileWhile(str: string, cursor: TreeCursor): InnerCompilationResult {
 	cursor.parent();
 
 	if(condType === "immer") {
-		return { kind: "success", result: `while(true) {\n\t${body.join("\n")}\n};` };
+		return { kind: "success", result: `while(true){${body.join("")}};` };
 	} else if(condType === "solange") {
-		return { kind: "success", result: `while(true) {\n\tlet n;\n\tfor(n of ${cond.result}) {\n\t\tyield n;\n\t}\n\tif(${inv ? "" : "!"}n) {\n\t\tbreak;\n\t}\n\t${body.join("\n")}\n};` };
+		return { kind: "success", result: `while(true){let n;for(n of ${cond.result}){yield n;}if(${inv ? "" : "!"}n){break;}${body.join("")}};` };
 	} else { // n mal
-		return { kind: "success", result: `for(let i = 0; i < ${times}; i++) {\n\t${body.join("\n")}\n};` };
+		return { kind: "success", result: `for(let i=0;i<${times};i++){${body.join("")}};` };
 	}
 }
 
 function compileWhileEnd(str: string, cursor: TreeCursor): InnerCompilationResult {
 	let pos: Position = {from: cursor.from, to: cursor.to};
 	cursor.firstChild(); // "wiederhole"
-	cursor.nextSibling();
 
 	let body = [];
 	while(cursor.nextSibling()) {
@@ -171,7 +170,7 @@ function compileWhileEnd(str: string, cursor: TreeCursor): InnerCompilationResul
 		return cond;
 
 	cursor.parent();
-	return { kind: "success", result: `do {\n\t${body.join("\n")}\n\tlet n;\n\tfor(n of ${cond.result}) {\n\t\tyield n;\n\t}\n\tif(${(inv !== bis) ? "" : "!"}n) {\n\t\tbreak;\n\t}\n} while(true);` };
+	return { kind: "success", result: `do{${body.join("")}let n;for(n of ${cond.result}){yield n;}if(${(inv !== bis) ? "" : "!"}n){break;}}while(true);` };
 }
 
 function compileIf(str: string, cursor: TreeCursor): InnerCompilationResult {
@@ -220,9 +219,9 @@ function compileIf(str: string, cursor: TreeCursor): InnerCompilationResult {
 
 	cursor.parent();
 	if(isElse)
-		return { kind: "success", result: `{\tlet n;\n\tfor(n of ${cond.result}) {\n\t\tyield n;\n\t}\n\tif(${inv ? "!" : ""}n) {\n\t\t${body.join("\n")}\n\t} else {\n\t\t${elseBody.join("\n")}\n\t}\n};`};
+		return { kind: "success", result: `{let n;for(n of ${cond.result}){yield n;};if(${inv ? "!" : ""}n){${body.join("")}}else{${elseBody.join("")}}};`};
 	
-	return { kind: "success", result: `{\tlet n;\n\tfor(n of ${cond.result}) {\n\t\tyield n;\n\t}\n\tif(${inv ? "!" : ""}n) {\n\t\t${body.join("\n")}\n\t}\n};`
+	return { kind: "success", result: `{let n;for(n of ${cond.result}){yield n;};if(${inv ? "!" : ""}n){${body.join("")}}};`
 	};
 }
 
@@ -248,7 +247,7 @@ function compileSubroutine(str: string, cursor: TreeCursor): DefinitionCompilati
 	}
 	cursor.parent();
 	
-	return { kind: "success", result: `function* ${subName}() {\n${body.join("\n")}\n}`, identifier: subName};
+	return { kind: "success", result: `function* ${subName}(){${body.join("")}};`, identifier: subName};
 }
 
 function compileCondition(str: string, cursor: TreeCursor): DefinitionCompilationResult {
@@ -273,7 +272,7 @@ function compileCondition(str: string, cursor: TreeCursor): DefinitionCompilatio
 	}
 	cursor.parent();
 	
-	return { kind: "success", result: `function* ${subName}() {\n${body.join("\n")}\n}`, identifier: subName};
+	return { kind: "success", result: `function* ${subName}(){${body.join("")}};`, identifier: subName};
 }
 
 function compileInner(str: string, cursor: TreeCursor): InnerCompilationResult {
@@ -437,11 +436,10 @@ export function compile(str: string): CompilationResult {
 			case ")":
 				break;
 			default: // faulty node detected -> parser error
-				console.log(cursor.name);
 				return { kind: "error", msg: "parse error", pos: pos };
 		}
 	} while(cursor.next());
 
 	let GeneratorFunction = Object.getPrototypeOf(function*(){}).constructor;
-	return { kind: "success", result: new GeneratorFunction("karol", `${program.join("\n")}`) };
+	return { kind: "success", result: new GeneratorFunction("karol", `${program.join("")}`) };
 }
