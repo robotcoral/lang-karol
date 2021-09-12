@@ -9,13 +9,13 @@ IdentifierWithParam {
 Subroutine { 
   kw<"Anweisung"> Identifier 
     statement* 
-  (kw<"endeAnweisung"> | "*" kw<"Anweisung">) 
+  (kw<"endeAnweisung"> | kwa<"*Anweisung">) 
 }
 
 Condition { 
   kw<"Bedingung"> Identifier 
     statement* 
-  (kw<"endeBedingung"> | "*" kw<"Bedingung">) 
+  (kw<"endeBedingung"> | kwa<"*Bedingung">) 
 }
 
 If { 
@@ -23,19 +23,19 @@ If {
     statement* 
   (kw<"sonst"> 
     statement*)? 
-  (kw<"endewenn"> | "*" kw<"wenn">)
+  (kw<"endewenn"> | kwa<"*wenn">)
 }
 
 While { 
   kw<"wiederhole"> (kw<"immer"> | Number kw<"mal"> | kw<"solange"> kw<"nicht">? (Identifier | IdentifierWithParam)) 
     statement* 
-  (kw<"endewiederhole"> | "*" kw<"wiederhole">) 
+  (kw<"endewiederhole"> | kwa<"*wiederhole">) 
 } 
 
 WhileEnd {
   kw<"wiederhole"> 
     statement* 
-  (kw<"endewiederhole"> | "*" kw<"wiederhole">) ((kw<"solange"> | kw<"bis">) kw<"nicht">? (Identifier | IdentifierWithParam)) 
+  (kw<"endewiederhole"> | kwa<"*wiederhole">) ((kw<"solange"> | kw<"bis">) kw<"nicht">? (Identifier | IdentifierWithParam)) 
 }
 
 statement {
@@ -61,5 +61,6 @@ statement {
 }
 
 kw<word> { @specialize[@name=Keyword]<Identifier, word> }
+kwa<word> { [@name=Keyword] {word} }
 
 @detectDelim

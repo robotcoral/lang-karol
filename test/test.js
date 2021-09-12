@@ -42,10 +42,10 @@ describe("TestProgram", () => {
 		endeBedingung
 		wiederhole
 			test
-		endewiederhole solange IstZiegel(5)
+		*wiederhole solange IstZiegel(5)
 		Anweisung test3
 			Schritt
-		endeAnweisung
+		*Anweisung
 	`);
   it("Compiles successfully", () => {
     assert.equal(res.kind, "success");
