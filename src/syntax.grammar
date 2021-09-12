@@ -49,11 +49,11 @@ statement {
 }
 
 @tokens {
-  Identifier { $[a-zA-Z_] $[a-zA-Z_\-0-9]* }
+  Identifier { $[a-zA-Z_äüö] $[a-zA-Z_äüö\-0-9]* }
   Number { $[0-9]+ }
   Colour { "rot" | "gelb" | "blau" | "grün" | "schwarz" }
   space { $[ \t\n\r;]+ }
-  comment { "{" $[a-zA-Z_ \t\n\r;\-0-9]* "}" }
+  comment { "{" $[a-zA-Z_äüö \t\n\r;\-0-9]* "}" }
   
   "(" ")"
 
