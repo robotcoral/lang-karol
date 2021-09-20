@@ -30,19 +30,5 @@ export const conditionIdentifiers = [
 ];
 
 export type Position = { from: number; to: number };
-
-export type KarolError = { kind: "error"; msg: string; pos: Position };
-
-export type CompilationResult =
-  | { kind: "success"; result: GeneratorFunction }
-  | KarolError;
-
-export type DefinitionCompilationResult =
-  | { kind: "success"; result: string; identifier: string }
-  | KarolError;
-
-export type InnerCompilationResult =
-  | { kind: "success"; result: string }
-  | KarolError;
-
-export type ExecutionResult = { kind: "success" } | KarolError;
+export type KarolError = { msg: string; pos: Position };
+export type DefinitionCompilationResult = { result: string; identifier: string }
