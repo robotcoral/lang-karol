@@ -34,7 +34,7 @@ Program(IdentifierWithParam(Identifier, Number))
 
 # Subroutine
 
-Anweisung abc
+aNwEisunG abc
   Schritt
 endeAnweisung
 
@@ -89,9 +89,9 @@ Program(
 
 # While Forever
 
-wiederhole immer
+wiedeRholE immer
   Schritt
-endewiederhole
+endewiedErhole
 
 ==>
 
@@ -99,9 +99,9 @@ Program(While(Keyword, Keyword, Identifier, Keyword))
 
 # While N Times
 
-wiederhole 10 mal
+wiEderhole 10 mAl
   Schritt
-endewiederhole
+endewIederhole
 
 ==>
 
@@ -109,11 +109,11 @@ Program(While(Keyword, Number, Keyword, Identifier, Keyword))
 
 # While Condition
 
-wiederhole solange abc
+wiedeRhole sOlange abc
   Schritt
 endewiederhole
 
-wiederhole solange nicht abc
+wiederhole solange niCht abc
   Schritt
 endewiederhole
 
@@ -135,11 +135,11 @@ endewiederhole solange nicht abc
 
 wiederhole
   Schritt
-endewiederhole bis abc
+endewiederhole bIs abc
 
 wiederhole
   Schritt
-endewiederhole bis nicht abc
+endewiederhole bis nichT abc
 
 ==>
 

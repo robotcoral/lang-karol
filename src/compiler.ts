@@ -215,7 +215,7 @@ function compileSubroutine(
     const body: String[] = [];
     while (cursor.nextSibling()) {
       val = getVal(str, cursor);
-      if (val === "endeAnweisung" || val === "*Anweisung") break;
+      if (val === "endeanweisung" || val === "*anweisung") break;
   
       let res = compileInner(str, cursor);
       body.push(res);
@@ -246,7 +246,7 @@ function compileCondition(
     const body: String[] = [];
     while (cursor.nextSibling()) {
       val = getVal(str, cursor);
-      if (val === "endeBedingung" || val === "*Bedingung") break;
+      if (val === "endebedingung" || val === "*bedingung") break;
   
       let res = compileInner(str, cursor);
       body.push(res);
@@ -290,6 +290,7 @@ function compileInner(str: string, cursor: TreeCursor): string {
 }
   
 export function compile(str: string): GeneratorFunction {
+    str = str.toLowerCase();
     let cursor: TreeCursor = parse(str).cursor();
     const program: string[] = [];
     const conditions: Set<string> = new Set();

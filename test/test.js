@@ -53,10 +53,10 @@ describe("TestProgram", () => {
       let i = 0;
       let j = 0;
       const karolMethods = {
-        Schritt: function () {
+        schritt: function () {
           return ++j;
         },
-        IstZiegel: function (val) {
+        istziegel: function (val) {
           if (i < Number(val)) {
             i++;
             return true;
