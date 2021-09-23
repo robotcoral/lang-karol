@@ -7,35 +7,35 @@ IdentifierWithParam {
 }
 
 Subroutine { 
-  kw<"Anweisung"> Identifier 
+  beginSubroutine Identifier 
     statement* 
-  (kw<"endeAnweisung"> | kwa<"*Anweisung">) 
+  endSubroutine
 }
 
 Condition { 
-  kw<"Bedingung"> Identifier 
+  beginCondition Identifier 
     statement* 
-  (kw<"endeBedingung"> | kwa<"*Bedingung">) 
+  endCondition
 }
 
 If { 
-  kw<"wenn"> kw<"nicht">? (Identifier | IdentifierWithParam) kw<"dann"> 
+  beginIf not? (Identifier | IdentifierWithParam) then 
     statement* 
-  (kw<"sonst"> 
+  (beginElse
     statement*)? 
-  (kw<"endewenn"> | kwa<"*wenn">)
+  endIf
 }
 
 While { 
-  kw<"wiederhole"> (kw<"immer"> | Number kw<"mal"> | kw<"solange"> kw<"nicht">? (Identifier | IdentifierWithParam)) 
+  beginWhile (forever | Number times | doWhile not? (Identifier | IdentifierWithParam)) 
     statement* 
-  (kw<"endewiederhole"> | kwa<"*wiederhole">) 
+  endWhile
 } 
 
 WhileEnd {
-  kw<"wiederhole"> 
+  beginWhile
     statement* 
-  (kw<"endewiederhole"> | kwa<"*wiederhole">) ((kw<"solange"> | kw<"bis">) kw<"nicht">? (Identifier | IdentifierWithParam)) 
+  endWhile (doWhile | until) not? (Identifier | IdentifierWithParam)
 }
 
 statement {
@@ -48,19 +48,31 @@ statement {
   WhileEnd
 }
 
+@external tokens beginSubroutineKW from "./keyword_tokenizer" { beginSubroutine[@name=Keyword] }
+@external tokens endSubroutineKW from "./keyword_tokenizer" { endSubroutine[@name=Keyword] }
+@external tokens beginConditionKW from "./keyword_tokenizer" { beginCondition[@name=Keyword] }
+@external tokens endConditionKW from "./keyword_tokenizer" { endCondition[@name=Keyword] }
+@external tokens beginIfKW from "./keyword_tokenizer" { beginIf[@name=Keyword] }
+@external tokens thenKW from "./keyword_tokenizer" { then[@name=Keyword] }
+@external tokens beginElseKW from "./keyword_tokenizer" { beginElse[@name=Keyword] }
+@external tokens endIfKW from "./keyword_tokenizer" { endIf[@name=Keyword] }
+@external tokens beginWhileKW from "./keyword_tokenizer" { beginWhile[@name=Keyword] }
+@external tokens endWhileKW from "./keyword_tokenizer" { endWhile[@name=Keyword] }
+@external tokens foreverKW from "./keyword_tokenizer" { forever[@name=Keyword] }
+@external tokens timesKW from "./keyword_tokenizer" { times[@name=Keyword] }
+@external tokens doWhileKW from "./keyword_tokenizer" { doWhile[@name=Keyword] }
+@external tokens untilKW from "./keyword_tokenizer" { until[@name=Keyword] }
+@external tokens notKW from "./keyword_tokenizer" { not[@name=Keyword] }
+
 @tokens {
   Identifier { $[a-zA-Z_äüö] $[a-zA-Z_äüö\-0-9]* }
   Number { $[0-9]+ }
   Colour { "rot" | "gelb" | "blau" | "grün" | "schwarz" }
   space { $[ \t\n\r;]+ }
-  comment { "{" $[a-zA-Z_äüö \t\n\r;\-0-9]* "}" }
-  
+  comment { "{" $[a-zA-Z_äüö \t\n\r;\-0-9]* "}" } 
   "(" ")"
 
   @precedence {Colour, Number, Identifier}
 }
-
-kw<word> { @specialize[@name=Keyword]<Identifier, word> }
-kwa<word> { [@name=Keyword] {word} }
 
 @detectDelim

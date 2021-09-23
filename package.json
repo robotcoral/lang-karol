@@ -4,7 +4,10 @@
   "description": "karol language support for CodeMirror",
   "scripts": {
     "test": "mocha test/test.js",
-    "prepare": "rollup -c"
+    "prepare-terms": "npx lezer-generator src/syntax.grammar -o src/karol.js && mv src/karol.terms.js src/karol.terms.ts",
+    "rollup": "rollup -c",
+    "prepare": "npm run prepare-terms && npm run rollup && npm run cleanup",
+    "cleanup": "rm src/karol.js"
   },
   "type": "module",
   "main": "dist/index.cjs",
