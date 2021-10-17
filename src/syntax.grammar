@@ -48,31 +48,33 @@ statement {
   WhileEnd
 }
 
-@external tokens beginSubroutineKW from "./keyword_tokenizer" { beginSubroutine[@name=Keyword] }
-@external tokens endSubroutineKW from "./keyword_tokenizer" { endSubroutine[@name=Keyword] }
-@external tokens beginConditionKW from "./keyword_tokenizer" { beginCondition[@name=Keyword] }
-@external tokens endConditionKW from "./keyword_tokenizer" { endCondition[@name=Keyword] }
-@external tokens beginIfKW from "./keyword_tokenizer" { beginIf[@name=Keyword] }
-@external tokens thenKW from "./keyword_tokenizer" { then[@name=Keyword] }
-@external tokens beginElseKW from "./keyword_tokenizer" { beginElse[@name=Keyword] }
-@external tokens endIfKW from "./keyword_tokenizer" { endIf[@name=Keyword] }
-@external tokens beginWhileKW from "./keyword_tokenizer" { beginWhile[@name=Keyword] }
-@external tokens endWhileKW from "./keyword_tokenizer" { endWhile[@name=Keyword] }
-@external tokens foreverKW from "./keyword_tokenizer" { forever[@name=Keyword] }
-@external tokens timesKW from "./keyword_tokenizer" { times[@name=Keyword] }
-@external tokens doWhileKW from "./keyword_tokenizer" { doWhile[@name=Keyword] }
-@external tokens untilKW from "./keyword_tokenizer" { until[@name=Keyword] }
-@external tokens notKW from "./keyword_tokenizer" { not[@name=Keyword] }
+@external specialize {Identifier} germanTokenizer from "./external_tokenizer" {
+  beginSubroutine[@name=Keyword],
+  endSubroutine[@name=Keyword],
+  beginCondition[@name=Keyword],
+  endCondition[@name=Keyword],
+  beginIf[@name=Keyword],
+  then[@name=Keyword],
+  beginElse[@name=Keyword],
+  endIf[@name=Keyword],
+  beginWhile[@name=Keyword],
+  endWhile[@name=Keyword],
+  forever[@name=Keyword],
+  times[@name=Keyword],
+  doWhile[@name=Keyword],
+  until[@name=Keyword],
+  not[@name=Keyword],
+  Colour[@name=Colour]
+}
 
 @tokens {
-  Identifier { $[a-zA-Z_äüö] $[a-zA-Z_äüö\-0-9]* }
+  Identifier { $[a-zA-Z_äüö\*] $[a-zA-Z_äüö\-0-9]* }
   Number { $[0-9]+ }
-  Colour { "rot" | "gelb" | "blau" | "grün" | "schwarz" }
   space { $[ \t\n\r;]+ }
   comment { "{" $[a-zA-Z_äüö \t\n\r;\-0-9]* "}" } 
   "(" ")"
 
-  @precedence {Colour, Number, Identifier}
+  @precedence {Number, Identifier}
 }
 
 @detectDelim
