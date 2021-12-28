@@ -1,6 +1,6 @@
 import { styleTags, tags as t } from "@codemirror/highlight";
 import { LanguageSupport, LRLanguage } from "@codemirror/language";
-import { parser } from "./syntax.grammar";
+import { parser } from "syntax.grammar";
 
 export const karolLanguage = LRLanguage.define({
     parser: parser.configure({

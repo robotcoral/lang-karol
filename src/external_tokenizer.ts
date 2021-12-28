@@ -1,6 +1,6 @@
-import { KarolLanguageSupport } from "./lang/lang";
-import { GermanLanguageSupport } from "./lang/de";
-import * as tokens from "./karol.terms";
+import { KarolLanguageSupport } from "lang/lang";
+import { GermanLanguageSupport } from "lang/de";
+import * as tokens from "karol.terms";
 
 const tokenMap: Map<string, number> = new Map(Object.entries(tokens));
 
