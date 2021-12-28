@@ -1,4 +1,4 @@
-import { DefinitionCompilationResult } from "compiler/types";
+import { DefinitionCompilationResult } from "./compiler_types";
 
 export function generateCall(val: string): string {
     return `yield karol.${val}();`;

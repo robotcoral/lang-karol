@@ -1,6 +1,6 @@
 import { TreeCursor } from "@lezer/common";
-import { getVal, conditionIdentifiersSet, callIdentifiersSet } from "compiler/compiler";
-import { Position } from "compiler/types";
+import { getVal, conditionIdentifiersSet, callIdentifiersSet } from "./compiler";
+import { Position } from "./compiler_types";
 
 export function semanticAnalysis(
     str: string, 

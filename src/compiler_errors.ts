@@ -1,4 +1,4 @@
-import { Position } from "compiler/types";
+import { Position } from "./compiler_types";
 
 export function noParamAllowed(pos: Position) {
     return {

@@ -1,4 +1,4 @@
-import { KarolLanguageSupport } from "lang/lang";
+import { KarolLanguageSupport } from "./lang";
 
 export const GermanLanguageSupport: KarolLanguageSupport = {
     keywords: {

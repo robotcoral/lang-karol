@@ -1,14 +1,14 @@
-import { parse } from "parser";
+import { parse } from "./parser";
 import { TreeCursor } from "@lezer/common";
 import {
     callIdentifiers,
     conditionIdentifiers,
     DefinitionCompilationResult,
     Position,
-} from "compiler/types";
-import * as gen from "compiler/code_generators";
-import * as karolErrors from "compiler/errors";
-import { semanticAnalysis } from "semantics";
+} from "./compiler_types";
+import * as gen from "./code_generators";
+import * as karolErrors from "./compiler_errors";
+import { semanticAnalysis } from "./semantics";
 
 export const callIdentifiersSet = new Set(callIdentifiers);
 export const conditionIdentifiersSet = new Set(conditionIdentifiers);
