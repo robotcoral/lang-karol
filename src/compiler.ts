@@ -6,6 +6,8 @@ import {
     DefinitionCompilationResult,
     Position,
 } from "./compiler_types";
+import * as gen from "./code_generators";
+import * as karolErrors from "./compiler_errors";
 import { semanticAnalysis } from "./semantics";
 
 export const callIdentifiersSet = new Set(callIdentifiers);
@@ -15,6 +17,22 @@ export function getVal(str: string, cursor: TreeCursor): string {
     return str.substring(cursor.from, cursor.to);
 }
 
+function isPredefinedIdentifier(val: string) {
+  return callIdentifiersSet.has(val) || conditionIdentifiersSet.has(val);
+}
+
+function isBool(val: string) {
+  return val === "wahr" || val === "falsch";
+}
+
+function isEnde(token: string, val: string) {
+  return val === `ende${token}` || val === `*${token}`;
+}
+
+function isNotRedefined(subroutines: Set<string>, conditions: Set<string>, defRes: DefinitionCompilationResult) {
+  return !subroutines.has(defRes.identifier) && !conditions.has(defRes.identifier)
+}
+
 function compileIdentifier(
     str: string,
     cursor: TreeCursor
@@ -22,29 +40,26 @@ function compileIdentifier(
     let val: string = getVal(str, cursor);
     let pos: Position = { from: cursor.from, to: cursor.to };
     if (cursor.name === "IdentifierWithParam") {
-      cursor.firstChild();
+      cursor.firstChild(); // Identifier
       val = getVal(str, cursor);
-      cursor.nextSibling();
-      cursor.nextSibling();
+      cursor.nextSibling(); // "("
+      cursor.nextSibling(); // (Colour | Number)
       let param: string = getVal(str, cursor);
-      if (callIdentifiersSet.has(val) || conditionIdentifiersSet.has(val)) {
-        cursor.parent();
-        return `yield karol.${val}("${param}");`;
+      if (isPredefinedIdentifier(val)) {
+        cursor.parent(); // IdentifierWithParam
+        return gen.generateCallWithParam(val, param);
       } else {
-        cursor.parent();
-        throw({
-          msg: "subroutine/condition calls must not contain parameters",
-          pos: pos,
-        });
+        cursor.parent(); // IdentifierWithParam
+        throw karolErrors.noParamAllowed(pos);
       }
     } else {
-      if (callIdentifiersSet.has(val) || conditionIdentifiersSet.has(val)) {
-        return `yield karol.${val}();`;
+      if (isPredefinedIdentifier(val)) {
+        return gen.generateCall(val);
       }
-      if (val === "wahr" || val === "falsch") {
-        return `yield ${val === "wahr"};`;
+      if (isBool(val)) {
+        return gen.generateBoolean(val);
       }
-      return `for(let n of ${val}()){yield n;};`;
+      return gen.generateCustomCall(val);
     }
 }
   
@@ -55,39 +70,36 @@ function compileConditionIdentifier(
     let val: string = getVal(str, cursor);
     let pos: Position = { from: cursor.from, to: cursor.to };
     if (cursor.name === "IdentifierWithParam") {
-      cursor.firstChild();
+      cursor.firstChild(); // Identifier
       val = getVal(str, cursor);
-      cursor.nextSibling();
-      cursor.nextSibling();
+      cursor.nextSibling(); // "("
+      cursor.nextSibling(); // (Colour | Number)
       let param: string = getVal(str, cursor);
-      if (callIdentifiersSet.has(val) || conditionIdentifiersSet.has(val)) {
-        cursor.parent();
-        return `(function*(){yield karol.${val}("${param}")})()`;
+      if (isPredefinedIdentifier(val)) {
+        cursor.parent(); // IdentifierWithParam
+        return gen.generateCallInConditionWithParam(val, param);
       } else {
-        cursor.parent();
-        throw({
-          msg: "subroutine/condition calls must not contain parameters",
-          pos: pos,
-        });
+        cursor.parent(); // IdentifierWithParam
+        throw karolErrors.noParamAllowed(pos);
       }
     } else {
-      if (callIdentifiersSet.has(val) || conditionIdentifiersSet.has(val)) {
-        return `(function*(){yield karol.${val}()})()`;
+      if (isPredefinedIdentifier(val)) {
+        return gen.generateCallInCondition(val);
       }
-      return `${val}()`;
+      return gen.generateCustomCallInCondition(val);
     }
 }
   
 function compileWhile(str: string, cursor: TreeCursor): string {
-    cursor.firstChild(); // "wiederhole"
-    cursor.nextSibling();
+    cursor.firstChild(); // beginWhile
+    cursor.nextSibling(); // (forever | Number times | doWhile not? (Identifier | IdentifierWithParam))
   
     let condType: string = getVal(str, cursor);
     let inv: boolean = false;
     let times: number = 0;
     let cond: string = "";
     if (condType === "solange") {
-      cursor.nextSibling();
+      cursor.nextSibling(); // not?
       if (getVal(str, cursor) === "nicht") {
         cursor.nextSibling();
         inv = true;
@@ -96,26 +108,26 @@ function compileWhile(str: string, cursor: TreeCursor): string {
       
     } else if (cursor.name === "Number") {
       times = Number(condType);
-      cursor.nextSibling(); // mal
+      cursor.nextSibling(); // times
     }
   
-    let body = [];
+    let body:string[] = [];
     while (cursor.nextSibling()) {
       let val = getVal(str, cursor);
-      if (val === "endewiederhole" || val === "*wiederhole") break;
+      if (isEnde("wiederhole", val)) break;
   
       let res = compileInner(str, cursor);
       body.push(res);
     }
   
-    cursor.parent();
+    cursor.parent(); // While
   
     if (condType === "immer") {
-      return `while(true){${body.join("")}};`;
+      return gen.generateInfiniteLoop(body);
     } else if (condType === "solange") {
-      return `while(true){let n;for(n of ${cond}){yield n;}if(${inv ? "" : "!"}n){break;}${body.join("")}};`;
+      return gen.generateWhileLoop(body, cond, inv);
     } else {
-      return `for(let i=0;i<${times};i++){${body.join("")}};`;
+      return gen.generateTimesLoop(body, times);
     }
 }
   
@@ -123,12 +135,12 @@ function compileWhileEnd(
     str: string,
     cursor: TreeCursor
   ): string {
-    cursor.firstChild(); // "wiederhole"
+    cursor.firstChild(); // beginWhile
   
     let body = [];
     while (cursor.nextSibling()) {
       let val = getVal(str, cursor);
-      if (val === "endewiederhole" || val === "*wiederhole") break;
+      if (isEnde("wiederhole", val)) break;
   
       let res = compileInner(str, cursor);
       body.push(res);
@@ -144,19 +156,19 @@ function compileWhileEnd(
     if (condType === "bis") {
       bis = true;
     }
-    cursor.nextSibling();
+    cursor.nextSibling(); // not?
     if (getVal(str, cursor) === "nicht") {
       cursor.nextSibling();
       inv = true;
     }
     cond = compileConditionIdentifier(str, cursor);
   
-    cursor.parent();
-    return `do{${body.join("")}let n;for(n of ${cond}){yield n;}if(${inv !== bis ? "" : "!"}n){break;}}while(true);`;
+    cursor.parent(); // WhileEnd
+    return gen.generateWhileEndLoop(body, cond, inv, bis);
 }
   
 function compileIf(str: string, cursor: TreeCursor): string {
-    cursor.firstChild(); // "wenn"
+    cursor.firstChild(); // "beginIf"
     cursor.nextSibling();
   
     let val: string = getVal(str, cursor);
@@ -171,12 +183,12 @@ function compileIf(str: string, cursor: TreeCursor): string {
     cursor.nextSibling(); // "dann"
   
     let isElse: boolean = false;
-    const body: String[] = [];
-    const elseBody: String[] = [];
+    const body: string[] = [];
+    const elseBody: string[] = [];
   
     while (cursor.nextSibling()) {
       val = getVal(str, cursor);
-      if (val === "endewenn" || val === "*wenn") break;
+      if (isEnde("wenn", val)) break;
       if (val === "sonst") {
         isElse = true;
         cursor.nextSibling();
@@ -193,71 +205,38 @@ function compileIf(str: string, cursor: TreeCursor): string {
   
     cursor.parent();
     if (isElse)
-      return `{let n;for(n of ${cond}){yield n;};if(${inv ? "!" : ""}n){${body.join("")}}else{${elseBody.join("")}}};`;
+      return gen.generateIfElse(body, elseBody, cond, inv);
   
-    return `{let n;for(n of ${cond}){yield n;};if(${inv ? "!" : ""}n){${body.join("")}}};`;
+    return gen.generateIf(body, cond, inv);
 }
-  
-function compileSubroutine(
-    str: string,
-    cursor: TreeCursor
-  ): DefinitionCompilationResult {
-    let pos: Position = { from: cursor.from, to: cursor.to };
-    cursor.firstChild(); // "Anweisung"
-    cursor.nextSibling();
-    let subName: string = getVal(str, cursor);
-    if (callIdentifiersSet.has(subName) || conditionIdentifiersSet.has(subName))
-      throw ({
-        msg: "redefinition of predefined subroutine",
-        pos: pos,
-      });
-  
-    let val;
-    const body: String[] = [];
-    while (cursor.nextSibling()) {
-      val = getVal(str, cursor);
-      if (val === "endeanweisung" || val === "*anweisung") break;
-  
-      let res = compileInner(str, cursor);
-      body.push(res);
-    }
-    cursor.parent();
-  
-    return {
-      result: `function* ${subName}(){${body.join("")}};`,
-      identifier: subName,
-    };
-}
-  
-function compileCondition(
-    str: string,
-    cursor: TreeCursor
-  ): DefinitionCompilationResult {
-    let pos: Position = { from: cursor.from, to: cursor.to };
-    cursor.firstChild(); // "Bedingung"
-    cursor.nextSibling();
-    let subName: string = getVal(str, cursor);
-    if (callIdentifiersSet.has(subName) || conditionIdentifiersSet.has(subName))
-      throw ({
-        msg: "redefinition of predefined condition",
-        pos: pos,
-      });
-  
-    let val;
-    const body: String[] = [];
-    while (cursor.nextSibling()) {
-      val = getVal(str, cursor);
-      if (val === "endebedingung" || val === "*bedingung") break;
-  
-      let res = compileInner(str, cursor);
-      body.push(res);
-    }
-    cursor.parent();
-  
-    return {
-      result: `function* ${subName}(){${body.join("")}};`,
-      identifier: subName,
-    };
+
+function compileDefinition(
+  str: string,
+  cursor: TreeCursor
+): DefinitionCompilationResult {
+  let pos: Position = { from: cursor.from, to: cursor.to };
+  let isSub = cursor.name === "Subroutine";
+  cursor.firstChild();
+  cursor.nextSibling();
+  let subName: string = getVal(str, cursor);
+  if (isPredefinedIdentifier(subName))
+    if(isSub)
+      throw karolErrors.predefinedSubRedefinition(pos);
+    else
+      throw karolErrors.predefinedCondRedefinition(pos);
+
+  let val;
+  const body: string[] = [];
+  while (cursor.nextSibling()) {
+    val = getVal(str, cursor);
+    if (isEnde(isSub ? "anweisung" : "bedingung", val)) break;
+
+    let res = compileInner(str, cursor);
+    body.push(res);
+  }
+  cursor.parent();
+
+  return gen.generateSub(body, subName);
 }
   
 function compileInner(str: string, cursor: TreeCursor): string {
@@ -275,15 +254,9 @@ function compileInner(str: string, cursor: TreeCursor): string {
       case "WhileEnd":
         return compileWhileEnd(str, cursor);
       case "Subroutine":
-        throw ({
-          msg: "subroutine must not be declared inside another subroutine/condition declaration",
-          pos: pos,
-        });
+        throw karolErrors.nestedSubDefintion(pos);
       case "Condition":
-        throw ({
-          msg: "condition must not be declared inside another subroutine/condition declaration",
-          pos: pos,
-        });
+        throw karolErrors.nestedCondDefintion(pos);
       default:
         // faulty node detected -> parser error
         throw { msg: "parse error", pos: pos };
@@ -303,39 +276,19 @@ export function compile(str: string): GeneratorFunction {
       let pos: Position = { from: cursor.from, to: cursor.to };
       let res: string;
       let defRes: DefinitionCompilationResult;
-      switch (cursor.name) {
-        case "Subroutine":
-          defRes = compileSubroutine(str, cursor);
-          if (
-            !subroutines.has(defRes.identifier) &&
-            !conditions.has(defRes.identifier)
-          )
+      if(cursor.name === "Subroutine" || cursor.name === "Condition") {
+        defRes = compileDefinition(str, cursor);
+        if (isNotRedefined(subroutines, conditions, defRes))
+          if(cursor.name === "Subroutine")
             subroutines.add(defRes.identifier);
           else
-            throw({
-              msg: "illegal subroutine redefintion",
-              pos: pos,
-            });
-          program.push(defRes.result);
-          break;
-        case "Condition":
-          defRes = compileCondition(str, cursor);
-          if (
-            !subroutines.has(defRes.identifier) &&
-            !conditions.has(defRes.identifier)
-          )
             conditions.add(defRes.identifier);
-          else
-            throw({
-              msg: "illegal subroutine redefintion",
-              pos: pos,
-            });
-          program.push(defRes.result);
-          break;
-        default:
-          res = compileInner(str, cursor);
-          program.push(res);
-          break;
+        else
+          throw karolErrors.illegalRedefinition(pos);
+        program.push(defRes.result);
+      } else {
+        res = compileInner(str, cursor);
+        program.push(res);
       }
     } while (cursor.nextSibling());
   
