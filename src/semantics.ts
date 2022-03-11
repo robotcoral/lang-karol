@@ -1,6 +1,7 @@
 import { TreeCursor } from "@lezer/common";
 import { getVal, conditionIdentifiersSet, callIdentifiersSet } from "./compiler";
 import { Position } from "./compiler_types";
+import { UndefinedCallError, NoConditionError } from "./compiler_errors";
 
 export function semanticAnalysis(
     str: string, 
@@ -22,10 +23,7 @@ export function semanticAnalysis(
             val !== "wahr" &&
             val !== "falsch"
           ) {
-            throw({
-              msg: "unknown subroutine/condition",
-              pos: { from: cursor.from, to: cursor.to },
-            });
+            throw new UndefinedCallError(pos, val);
           }
           break;
         case "IdentifierWithParam":
@@ -43,10 +41,7 @@ export function semanticAnalysis(
             val = getVal(str, cursor);
           }
           if (!conditions.has(val) && !conditionIdentifiersSet.has(val)) {
-            throw({
-              msg: "identifier must be a condition",
-              pos: { from: cursor.from, to: cursor.to },
-            });
+            throw new NoConditionError(pos, val);
           }
           cursor.parent();
           break;
@@ -69,10 +64,7 @@ export function semanticAnalysis(
             val = getVal(str, cursor);
           }
           if (!conditions.has(val) && !conditionIdentifiersSet.has(val)) {
-            throw({
-              msg: "identifier must be a condition",
-              pos: { from: cursor.from, to: cursor.to },
-            });
+            throw new NoConditionError(pos, val);
           }
           cursor.parent();
           break;
@@ -95,10 +87,7 @@ export function semanticAnalysis(
             val = getVal(str, cursor);
           }
           if (!conditions.has(val) && !conditionIdentifiersSet.has(val)) {
-            throw({
-              msg: "identifier must be a condition",
-              pos: { from: cursor.from, to: cursor.to },
-            });
+            throw new NoConditionError(pos, val);
           }
           cursor.parent();
           break;

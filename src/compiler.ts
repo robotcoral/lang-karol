@@ -50,7 +50,7 @@ function compileIdentifier(
         return gen.generateCallWithParam(val, param);
       } else {
         cursor.parent(); // IdentifierWithParam
-        throw karolErrors.noParamAllowed(pos);
+        throw new karolErrors.NoParamAllowedError(pos, val);
       }
     } else {
       if (isPredefinedIdentifier(val)) {
@@ -80,7 +80,7 @@ function compileConditionIdentifier(
         return gen.generateCallInConditionWithParam(val, param);
       } else {
         cursor.parent(); // IdentifierWithParam
-        throw karolErrors.noParamAllowed(pos);
+        throw new karolErrors.NoParamAllowedError(pos, val);
       }
     } else {
       if (isPredefinedIdentifier(val)) {
@@ -220,10 +220,7 @@ function compileDefinition(
   cursor.nextSibling();
   let subName: string = getVal(str, cursor);
   if (isPredefinedIdentifier(subName))
-    if(isSub)
-      throw karolErrors.predefinedSubRedefinition(pos);
-    else
-      throw karolErrors.predefinedCondRedefinition(pos);
+    throw new karolErrors.PredefinedSubRedefinitionError(pos, subName);
 
   let val;
   const body: string[] = [];
@@ -254,11 +251,10 @@ function compileInner(str: string, cursor: TreeCursor): string {
       case "WhileEnd":
         return compileWhileEnd(str, cursor);
       case "Subroutine":
-        throw karolErrors.nestedSubDefintion(pos);
+        throw new karolErrors.NestedSubDefintionError(pos, val);
       case "Condition":
-        throw karolErrors.nestedCondDefintion(pos);
+        throw new karolErrors.NestedSubDefintionError(pos, val);
       default:
-        // faulty node detected -> parser error
         throw { msg: "parse error", pos: pos };
     }
 }
@@ -284,7 +280,7 @@ export function compile(str: string): GeneratorFunction {
           else
             conditions.add(defRes.identifier);
         else
-          throw karolErrors.illegalRedefinition(pos);
+          throw new karolErrors.IllegalRedefinitionError(pos, defRes.identifier);
         program.push(defRes.result);
       } else {
         res = compileInner(str, cursor);

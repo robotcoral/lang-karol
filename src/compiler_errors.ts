@@ -1,43 +1,52 @@
 import { Position } from "./compiler_types";
 
-export function noParamAllowed(pos: Position) {
-    return {
-        msg: "subroutine/condition calls must not contain parameters",
-        pos: pos,
-    };
+export class CompilerError {
+    pos: Position;
+    msg: String;
+    constructor(pos: Position, msg: String) {
+        this.pos = pos;
+        this.msg = msg;
+    }
+    get getPosition() {
+        return this.pos;
+    }
+    get getMessage() {
+        return this.msg;
+    }
 }
 
-export function predefinedSubRedefinition(pos: Position) {
-    return {
-        msg: "redefinition of predefined subroutine",
-        pos: pos,
-    };
+export class NoParamAllowedError extends CompilerError {
+    constructor(pos: Position, subName: String) {
+        super(pos, `call to ${subName} must not contain parameters`);
+    }
 }
 
-export function predefinedCondRedefinition(pos: Position) {
-    return {
-        msg: "redefinition of predefined condition",
-        pos: pos,
-    };
+export class PredefinedSubRedefinitionError extends CompilerError {
+    constructor(pos: Position, subName: String) {
+        super(pos, `${subName} is predefined`);
+    }
 }
 
-export function nestedSubDefintion(pos: Position) {
-    return {
-        msg: "subroutine must not be declared inside another subroutine/condition declaration",
-        pos: pos,
-    };
+export class NestedSubDefintionError extends CompilerError {
+    constructor(pos: Position, subName: String) {
+        super(pos, `${subName} must not be defined inside another definition`);
+    }
 }
 
-export function nestedCondDefintion(pos: Position) {
-    return {
-        msg: "condition must not be declared inside another subroutine/condition declaration",
-        pos: pos,
-    };
+export class IllegalRedefinitionError extends CompilerError {
+    constructor(pos: Position, subName: String) {
+        super(pos, `illegal redefintion of ${subName}`);
+    }
 }
 
-export function illegalRedefinition(pos: Position) {
-    return {
-        msg: "illegal redefintion",
-        pos: pos,
-    };
+export class UndefinedCallError extends CompilerError {
+    constructor(pos: Position, subName: String) {
+        super(pos, `${subName} is undefined`);
+    }
+}
+
+export class NoConditionError extends CompilerError {
+    constructor(pos: Position, subName: String) {
+        super(pos, `${subName} is not a condition`);
+    }
 }

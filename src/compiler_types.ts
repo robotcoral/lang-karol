@@ -30,5 +30,4 @@ export const conditionIdentifiers = [
 ];
 
 export type Position = { from: number; to: number };
-export type KarolError = { msg: string; pos: Position };
 export type DefinitionCompilationResult = { result: string; identifier: string }
