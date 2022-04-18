@@ -8,34 +8,60 @@ IdentifierWithParam {
 
 Subroutine { 
   beginSubroutine Identifier 
-    statement* 
+    Body
   endSubroutine
 }
 
 Condition { 
   beginCondition Identifier 
-    statement* 
+    Body
   endCondition
 }
 
 If { 
-  beginIf not? (Identifier | IdentifierWithParam) then 
-    statement* 
-  (beginElse
-    statement*)? 
+  beginIf Cond then 
+    Body
   endIf
 }
 
-While { 
-  beginWhile (forever | Number times | doWhile not? (Identifier | IdentifierWithParam)) 
-    statement* 
-  endWhile
-} 
+IfElse {
+  beginIf Cond then 
+    Body 
+  beginElse
+    Body
+  endIf
+}
 
-WhileEnd {
+TimesLoop { 
+  beginWhile Number times
+    Body
+  endWhile
+}
+
+InfLoop { 
+  beginWhile forever
+    Body
+  endWhile
+}
+
+While { 
+  beginWhile doWhile Cond
+    Body
+  endWhile
+}
+
+DoWhile {
   beginWhile
-    statement* 
-  endWhile (doWhile | until) not? (Identifier | IdentifierWithParam)
+    Body 
+  endWhile (doWhile | until) Cond
+}
+
+Body {
+  statement*
+}
+
+Cond {
+  not? (Identifier | IdentifierWithParam)
 }
 
 statement {
@@ -44,6 +70,8 @@ statement {
   Subroutine |
   Condition |
   If |
+  InfLoop |
+  TimesLoop |
   While |
   WhileEnd
 }

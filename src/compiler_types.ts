@@ -1,3 +1,5 @@
+import { TreeCursor } from "@lezer/common";
+
 export const callIdentifiers = [
   "schritt",
   "linksdrehen",
@@ -31,3 +33,5 @@ export const conditionIdentifiers = [
 
 export type Position = { from: number; to: number };
 export type DefinitionCompilationResult = { result: string; identifier: string }
+export type CondCompilationResult = { result: string, inv: boolean }
+export type TreeData = { str: string, cursor: TreeCursor}
