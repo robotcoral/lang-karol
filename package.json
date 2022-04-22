@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "lezer": "^0.13.5",
-    "@lezer/lr": "^0.15.4",
+    "@lezer/lr": "^0.16.2",
     "@lezer/common": "^0.15.4"
   },
   "devDependencies": {
