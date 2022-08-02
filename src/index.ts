@@ -1,3 +1,4 @@
-export { karol, parse, karolLanguage } from "./parser";
-export { compile, callIdentifiersSet, conditionIdentifiersSet } from "./compiler";
+export { compile } from "./compiler";
 export * from "./compiler_types";
+export { karol, karolLanguage, parse } from "./parser";
+export { callIdentifiersSet, conditionIdentifiersSet } from "./semantics";
