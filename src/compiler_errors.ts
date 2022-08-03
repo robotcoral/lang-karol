@@ -1,43 +1,20 @@
 import { Position } from "./compiler_types";
 
-export function noParamAllowed(pos: Position) {
-    return {
-        msg: "subroutine/condition calls must not contain parameters",
-        pos: pos,
-    };
+export class CompilerError extends Error {
+	constructor(public msg: string, public pos: Position) {
+		super(msg);
+		this.name = this.constructor.name;
+	}
 }
 
-export function predefinedSubRedefinition(pos: Position) {
-    return {
-        msg: "redefinition of predefined subroutine",
-        pos: pos,
-    };
-}
-
-export function predefinedCondRedefinition(pos: Position) {
-    return {
-        msg: "redefinition of predefined condition",
-        pos: pos,
-    };
-}
-
-export function nestedSubDefintion(pos: Position) {
-    return {
-        msg: "subroutine must not be declared inside another subroutine/condition declaration",
-        pos: pos,
-    };
-}
-
-export function nestedCondDefintion(pos: Position) {
-    return {
-        msg: "condition must not be declared inside another subroutine/condition declaration",
-        pos: pos,
-    };
-}
-
-export function illegalRedefinition(pos: Position) {
-    return {
-        msg: "illegal redefintion",
-        pos: pos,
-    };
-}
+export const CompilerErrorMessages = {
+	noParamAllowed: "subroutine/condition calls must not contain parameters",
+	predefinedSubRedefinition: "redefinition of predefined subroutine",
+	predefinedCondRedefinition: "redefinition of predefined condition",
+	nestedSubDefintion:
+		"subroutine must not be declared inside another subroutine/condition declaration",
+	nestedCondDefintion:
+		"condition must not be declared inside another subroutine/condition declaration",
+	illegalRedefinition: "illegal redefintion",
+	parseError: "parse error",
+};
