@@ -1,6 +1,6 @@
 import { TreeCursor } from "@lezer/common";
 import * as gen from "./code_generators";
-import * as karolErrors from "./compiler_errors";
+import { CompilerError, CompilerErrorMessages } from "./compiler_errors";
 import { DefinitionCompilationResult, Position } from "./compiler_types";
 import { parse } from "./parser";
 import {
@@ -46,7 +46,7 @@ function compileIdentifier(str: string, cursor: TreeCursor): string {
 			return gen.generateCallWithParam(val, param);
 		} else {
 			cursor.parent(); // IdentifierWithParam
-			throw karolErrors.noParamAllowed(pos);
+			throw new CompilerError(CompilerErrorMessages.noParamAllowed, pos);
 		}
 	} else {
 		if (isPredefinedIdentifier(val)) {
@@ -73,7 +73,7 @@ function compileConditionIdentifier(str: string, cursor: TreeCursor): string {
 			return gen.generateCallInConditionWithParam(val, param);
 		} else {
 			cursor.parent(); // IdentifierWithParam
-			throw karolErrors.noParamAllowed(pos);
+			throw new CompilerError(CompilerErrorMessages.noParamAllowed, pos);
 		}
 	} else {
 		if (isPredefinedIdentifier(val)) {
@@ -208,8 +208,16 @@ function compileDefinition(
 	cursor.nextSibling();
 	let subName: string = getVal(str, cursor);
 	if (isPredefinedIdentifier(subName))
-		if (isSub) throw karolErrors.predefinedSubRedefinition(pos);
-		else throw karolErrors.predefinedCondRedefinition(pos);
+		if (isSub)
+			throw new CompilerError(
+				CompilerErrorMessages.predefinedSubRedefinition,
+				pos
+			);
+		else
+			throw new CompilerError(
+				CompilerErrorMessages.predefinedCondRedefinition,
+				pos
+			);
 
 	let val;
 	const body: string[] = [];
@@ -226,7 +234,6 @@ function compileDefinition(
 }
 
 function compileInner(str: string, cursor: TreeCursor): string {
-	let val: string = getVal(str, cursor);
 	let pos: Position = { from: cursor.from, to: cursor.to };
 	switch (cursor.name) {
 		case "Identifier":
@@ -240,12 +247,12 @@ function compileInner(str: string, cursor: TreeCursor): string {
 		case "WhileEnd":
 			return compileWhileEnd(str, cursor);
 		case "Subroutine":
-			throw karolErrors.nestedSubDefintion(pos);
+			throw new CompilerError(CompilerErrorMessages.nestedSubDefintion, pos);
 		case "Condition":
-			throw karolErrors.nestedCondDefintion(pos);
+			throw new CompilerError(CompilerErrorMessages.nestedCondDefintion, pos);
 		default:
 			// faulty node detected -> parser error
-			throw { msg: "parse error", pos: pos };
+			throw new CompilerError(CompilerErrorMessages.parseError, pos);
 	}
 }
 
@@ -258,7 +265,6 @@ export function compile(str: string): GeneratorFunction {
 
 	cursor.firstChild();
 	do {
-		let val: string = getVal(str, cursor);
 		let pos: Position = { from: cursor.from, to: cursor.to };
 		let res: string;
 		let defRes: DefinitionCompilationResult;
@@ -267,7 +273,8 @@ export function compile(str: string): GeneratorFunction {
 			if (isNotRedefined(subroutines, conditions, defRes))
 				if (cursor.name === "Subroutine") subroutines.add(defRes.identifier);
 				else conditions.add(defRes.identifier);
-			else throw karolErrors.illegalRedefinition(pos);
+			else
+				throw new CompilerError(CompilerErrorMessages.illegalRedefinition, pos);
 			program.push(defRes.result);
 		} else {
 			res = compileInner(str, cursor);
