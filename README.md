@@ -9,7 +9,7 @@
 
 ## Description
 
-CodeMirror 6 language package for karol
+CodeMirror 6 language package for Karol
 
 ## Setting up your development environment
 
@@ -18,7 +18,7 @@ TODO
 ## Development Guidelines
 
 Please abide by the following guidelines to keep the repository as clean as possible.
-As a general rule we require all commits to be signed.
+As a general rule, we require all commits to be signed.
 
 ### Branches
 
@@ -38,21 +38,20 @@ The following types can be used:
 
 #### Release Branches
 
-After all the features that will be included in the next release have been merged into master, you can create a new branch named `release/version`.
+After all the features that will be included in the next release have been merged into main, you can create a new branch named `release/version`.
 No new features may be added to this release branch. The only acceptable commits to release branches are:
-
-- small tidying up task
+- small tidying-up task
 - bumping the version
 - fixes
 
 #### Hotfixes
 
-Hotfix branches may be created from master and merged directly back into it. They have to be named `hotfix/issue`
+Hotfix branches may be created from main and merged directly back into it. They have to be named `hotfix/issue`
 
-#### Master Branch
+#### Main Branch
 
-The master branch **only** contains tagged commits corresponding to software releases!
-To create a new release merge a release or hotfix branch into master and create a new tag (`v1.2.3`).
+The main branch **only** contains tagged commits corresponding to software releases!
+To create a new release merge a release or hotfix branch into main and create a new tag (`v1.2.3`).
 
 ### Commits
 
@@ -81,8 +80,7 @@ You can find a brief summary below:
   If an update introduces breaking changes add a `!` after the type (and scope) and optionally add the `BREAKING CHANGE` footer.
 
 The commit message should also follow these rules:
-
-1. Separate subject from body with a blank line
+1. Separate the subject from the body with a blank line
 2. Limit the subject line to 50 characters
 3. Capitalize the subject line
 4. Do not end the subject line with a period

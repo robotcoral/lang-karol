@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "target": "es6",
-    "module": "es2020",
-    "newLine": "lf",
-    "declaration": true,
-    "moduleResolution": "node"
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "strict": true
   },
-  "include": ["src/*.ts"]
+  "include": ["src"]
 }
